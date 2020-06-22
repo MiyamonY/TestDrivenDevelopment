@@ -7,11 +7,8 @@ open Money
 [<Fact>]
 let ``Multiplication`` () =
     let five = Dollar(5)
-    let product = five.Times(2)
-    Assert.Equal(10, product.Amount)
-
-    let product = five.Times(3)
-    Assert.Equal(15, product.Amount)
+    Assert.Equal(Dollar(10), five.Times(2))
+    Assert.Equal(Dollar(15), five.Times(3))
 
 [<Fact>]
 let ``Equality`` () =

@@ -5,18 +5,15 @@ open System
 
 // []  $5 + 10CHF = $10
 // [x] $5 * 2  = $10
-// []  amountをprivateに
+// [x]  amountをprivateに
 // [x] Dollarの副作用
 // []  Moneyの丸め処理
-// [] struct(to value object)
+// [x] struct(to value object)
 
 type Dollar =
     struct
         val amount: int
         new(amount: int) = {amount = amount}
-
-        member this.Amount
-          with get() = this.amount
 
         member this.Times(multiplier: int) =
               Dollar(this.amount*multiplier)
