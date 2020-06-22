@@ -9,6 +9,9 @@ open System
 // [x] Dollarの副作用
 // []  Moneyの丸め処理
 // [x] struct(to value object)
+// [x] 5CHF*2 = 10CHF
+// [] DollarとFrancの重複
+// [] timesの一般化
 
 type Dollar =
     struct
@@ -17,6 +20,15 @@ type Dollar =
 
         member this.Times(multiplier: int) =
               Dollar(this.amount*multiplier)
+    end
+
+type Franc =
+    struct
+        val amount: int
+        new(amount: int) = {amount = amount}
+
+        member this.Times(multiplier: int) =
+              Franc(this.amount*multiplier)
     end
 
 [<EntryPoint>]
