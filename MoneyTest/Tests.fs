@@ -14,6 +14,8 @@ let ``Multiplication`` () =
 let ``Equality`` () =
     Assert.Equal(Dollar(5), Dollar(5))
     Assert.NotEqual(Dollar(5), Dollar(6))
+    Assert.Equal(Franc(5), Franc(5))
+    Assert.NotEqual(Franc(5), Franc(6))
 
 [<Fact>]
 let ``FrancMultiplication`` () =

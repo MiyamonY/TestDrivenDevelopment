@@ -11,25 +11,35 @@ open System
 // [x] struct(to value object)
 // [x] 5CHF*2 = 10CHF
 // [] DollarとFrancの重複
+// [x] equalの一般化
 // [] timesの一般化
+// [] hashCode()
+// [] DollarとFrancの比較
 
-type Dollar =
-    struct
-        val amount: int
-        new(amount: int) = {amount = amount}
+type Money(amount:int) =
+    let amount = amount
 
-        member this.Times(multiplier: int) =
-              Dollar(this.amount*multiplier)
-    end
+    member _.Amount
+        with get() = amount
 
-type Franc =
-    struct
-        val amount: int
-        new(amount: int) = {amount = amount}
+    override _.Equals(obj: Object) =
+        match obj with
+            | :? Money as money -> amount = money.Amount
+            | _ -> false
 
-        member this.Times(multiplier: int) =
-              Franc(this.amount*multiplier)
-    end
+type Dollar(amount:int) =
+    inherit Money(amount)
+
+
+    member this.Times(multiplier: int) =
+              Dollar(amount*multiplier)
+
+
+type Franc(amount: int) =
+    inherit Money(amount)
+
+    member this.Times(multiplier: int) =
+              Franc(amount*multiplier)
 
 [<EntryPoint>]
 let main argv =
