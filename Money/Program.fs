@@ -14,7 +14,7 @@ open System
 // [x] equalの一般化
 // [] timesの一般化
 // [] hashCode()
-// [] DollarとFrancの比較
+// [x] DollarとFrancの比較
 
 type Money(amount:int) =
     let amount = amount
@@ -22,9 +22,10 @@ type Money(amount:int) =
     member _.Amount
         with get() = amount
 
-    override _.Equals(obj: Object) =
+    override this.Equals(obj: Object) =
         match obj with
-            | :? Money as money -> amount = money.Amount
+            | :? Money as money ->
+                amount = money.Amount && this.GetType().Equals(money.GetType())
             | _ -> false
 
 type Dollar(amount:int) =
