@@ -22,8 +22,8 @@ type Money(amount:int, currency:string) =
     let amount = amount
     member this.currency = currency
 
-    static member Dollar(amount:int) = Dollar(amount, "USD") :> Money
-    static member Franc(amount:int) = Franc(amount, "CHF") :> Money
+    static member Dollar(amount:int) = Money(amount, "USD")
+    static member Franc(amount:int) = Money(amount, "CHF")
 
     member _.Amount
         with get() = amount
@@ -38,12 +38,6 @@ type Money(amount:int, currency:string) =
             | :? Money as money ->
                 amount = money.Amount && this.Currency() = money.Currency()
             | _ -> false
-
-and Dollar(amount:int, currency: string) =
-    inherit Money(amount, currency)
-
-and Franc(amount: int, currency: string) =
-    inherit Money(amount, currency)
 
 [<EntryPoint>]
 let main argv =
