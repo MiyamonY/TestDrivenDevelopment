@@ -12,16 +12,15 @@ open System
 // [x] 5CHF*2 = 10CHF
 // [] DollarとFrancの重複
 // [x] equalの一般化
-// [] timesの一般化
+// [x] timesの一般化
 // [] hashCode()
 // [x] DollarとFrancの比較
 // [x] 通貨の概念
 // [] testFanctMultiplicationを削除する？
 
-[<AbstractClass>]
 type Money(amount:int, currency:string) =
     let amount = amount
-    let currency = currency
+    member this.currency = currency
 
     static member Dollar(amount:int) = Dollar(amount, "USD") :> Money
     static member Franc(amount:int) = Franc(amount, "CHF") :> Money
@@ -29,28 +28,22 @@ type Money(amount:int, currency:string) =
     member _.Amount
         with get() = amount
 
-    abstract Times : int -> Money
-
     member this.Currency () = currency
+
+    member this.Times(multiplier: int) =
+        Money(amount*multiplier, this.currency)
 
     override this.Equals(obj: Object) =
         match obj with
             | :? Money as money ->
-                amount = money.Amount && this.GetType().Equals(money.GetType())
+                amount = money.Amount && this.Currency() = money.Currency()
             | _ -> false
 
 and Dollar(amount:int, currency: string) =
     inherit Money(amount, currency)
 
-    override _.Times(multiplier: int) =
-        Money.Dollar(amount*multiplier)
-
 and Franc(amount: int, currency: string) =
     inherit Money(amount, currency)
-
-
-    override this.Times(multiplier: int) =
-        Money.Franc(amount*multiplier)
 
 [<EntryPoint>]
 let main argv =

@@ -20,6 +20,10 @@ let ``Equality`` () =
     Assert.False(Money.Franc(5).Equals(Money.Dollar(5)))
 
 [<Fact>]
+let ``DifferentClassEquality`` () =
+    Assert.True(Money(10, "CHF").Equals(Franc(10, "CHF")))
+
+[<Fact>]
 let ``FrancMultiplication`` () =
     let five = Money.Franc(5)
     Assert.Equal<Money>(Money.Franc(10), five.Times(2))
