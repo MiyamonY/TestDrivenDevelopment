@@ -1,5 +1,5 @@
 ﻿// Learn more about F# at http://fsharp.org
-module Money
+module Moneys
 
 open System
 
@@ -15,20 +15,23 @@ open System
 // [] timesの一般化
 // [] hashCode()
 // [x] DollarとFrancの比較
-// [] 通貨の概念
+// [x] 通貨の概念
 // [] testFanctMultiplicationを削除する？
 
 [<AbstractClass>]
-type Money(amount:int) =
+type Money(amount:int, currency:string) =
     let amount = amount
+    let currency = currency
 
-    let Dollar(amount:int) = Dollar(amount) :> Money
-    let Franc(amount:int) = Franc(amount) :> Money
+    static member Dollar(amount:int) = Dollar(amount, "USD") :> Money
+    static member Franc(amount:int) = Franc(amount, "CHF") :> Money
 
     member _.Amount
         with get() = amount
 
     abstract Times : int -> Money
+
+    member this.Currency () = currency
 
     override this.Equals(obj: Object) =
         match obj with
@@ -36,17 +39,18 @@ type Money(amount:int) =
                 amount = money.Amount && this.GetType().Equals(money.GetType())
             | _ -> false
 
-and Dollar(amount:int) =
-    inherit Money(amount)
+and Dollar(amount:int, currency: string) =
+    inherit Money(amount, currency)
+
+    override _.Times(multiplier: int) =
+        Money.Dollar(amount*multiplier)
+
+and Franc(amount: int, currency: string) =
+    inherit Money(amount, currency)
+
 
     override this.Times(multiplier: int) =
-        Dollar(amount*multiplier) :> Money
-
-and Franc(amount: int) =
-    inherit Money(amount)
-
-    override this.Times(multiplier: int) =
-        Franc(amount*multiplier) :> Money
+        Money.Franc(amount*multiplier)
 
 [<EntryPoint>]
 let main argv =
