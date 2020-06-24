@@ -6,21 +6,21 @@ open Money
 
 [<Fact>]
 let ``Multiplication`` () =
-    let five = Dollar(5)
-    Assert.Equal(Dollar(10), five.Times(2))
-    Assert.Equal(Dollar(15), five.Times(3))
+    let five = Money.Dollar(5)
+    Assert.Equal<Money>(Money.Dollar(10), five.Times(2))
+    Assert.Equal<Money>(Money.Dollar(15), five.Times(3))
 
 [<Fact>]
 let ``Equality`` () =
-    Assert.Equal(Dollar(5), Dollar(5))
-    Assert.NotEqual(Dollar(5), Dollar(6))
-    Assert.Equal(Franc(5), Franc(5))
-    Assert.NotEqual(Franc(5), Franc(6))
+    Assert.True(Money.Dollar(5).Equals(Money.Dollar(5)))
+    Assert.False(Money.Dollar(5).Equals(Money.Dollar(6)))
+    Assert.True(Money.Franc(5).Equals(Money.Franc(5)))
+    Assert.False(Money.Franc(5).Equals(Money.Franc(6)))
 
-    Assert.False(Franc(5).Equals(Dollar(5)))
+    Assert.False(Money.Franc(5).Equals(Money.Dollar(5)))
 
 [<Fact>]
 let ``FrancMultiplication`` () =
-    let five = Franc(5)
-    Assert.Equal(Franc(10), five.Times(2))
-    Assert.Equal(Franc(15), five.Times(3))
+    let five = Money.Franc(5)
+    Assert.Equal<Money>(Franc(10), five.Times(2))
+    Assert.Equal<Money>(Franc(15), five.Times(3))

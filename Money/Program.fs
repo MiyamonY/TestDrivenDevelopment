@@ -15,12 +15,20 @@ open System
 // [] timesの一般化
 // [] hashCode()
 // [x] DollarとFrancの比較
+// [] 通貨の概念
+// [] testFanctMultiplicationを削除する？
 
+[<AbstractClass>]
 type Money(amount:int) =
     let amount = amount
 
+    let Dollar(amount:int) = Dollar(amount) :> Money
+    let Franc(amount:int) = Franc(amount) :> Money
+
     member _.Amount
         with get() = amount
+
+    abstract Times : int -> Money
 
     override this.Equals(obj: Object) =
         match obj with
@@ -28,19 +36,17 @@ type Money(amount:int) =
                 amount = money.Amount && this.GetType().Equals(money.GetType())
             | _ -> false
 
-type Dollar(amount:int) =
+and Dollar(amount:int) =
     inherit Money(amount)
 
+    override this.Times(multiplier: int) =
+        Dollar(amount*multiplier) :> Money
 
-    member this.Times(multiplier: int) =
-              Dollar(amount*multiplier)
-
-
-type Franc(amount: int) =
+and Franc(amount: int) =
     inherit Money(amount)
 
-    member this.Times(multiplier: int) =
-              Franc(amount*multiplier)
+    override this.Times(multiplier: int) =
+        Franc(amount*multiplier) :> Money
 
 [<EntryPoint>]
 let main argv =
