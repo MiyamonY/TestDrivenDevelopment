@@ -3,21 +3,26 @@ module Moneys
 
 open System
 
-// [] $5 + 10CHF = $10
+// [x] $5 + 10CHF = $10
 // [x] $5 + $5 = $10
 // [] $5+$5がMoneyをかえす
 // [x] Bank.reduce(Money)
 // [x] Moneyを変換して換算を行う
 // [x] Reduce(Bank, string)
+// [] Expression.times
+// [] Sum.plus
 
 type IExpression =
     abstract member Reduce : Bank*string -> Money
+    abstract member Plus : IExpression -> IExpression
 
 and Money(amount:int, currency:string) =
     interface IExpression with
         member this.Reduce(bank: Bank, to_: string) =
             let rate = bank.Rate(currency, to_)
             Money.Dollar(amount / rate)
+        member this.Plus(addend:IExpression) =
+            Sum(this, addend) :> IExpression
 
     member this.currency = currency
 
@@ -27,10 +32,10 @@ and Money(amount:int, currency:string) =
     member this.Currency () = currency
 
     member this.Times(multiplier: int) =
-        Money(amount*multiplier, this.currency)
+        Money(amount*multiplier, this.currency) :> IExpression
 
-    member this.Plus(addend:Money) =
-        Sum(this, addend)
+    member this.Plus(addend:IExpression) =
+        (this :> IExpression).Plus(addend)
 
     override this.Equals(obj: Object) =
         match obj with
@@ -41,10 +46,12 @@ and Money(amount:int, currency:string) =
     static member Dollar(amount:int) = Money(amount, "USD")
     static member Franc(amount:int) = Money(amount, "CHF")
 
-and Sum(augend: Money, addend:Money) =
+and Sum(augend: IExpression, addend: IExpression) =
     interface IExpression with
         member _.Reduce (bank: Bank, to_: string) =
-            Money(augend.Amount + addend.Amount, to_)
+            let amount = augend.Reduce(bank, to_).Amount  + addend.Reduce(bank, to_).Amount
+            Money(amount, to_)
+        member _.Plus (addend:IExpression) = Money.Dollar(0) :> IExpression
 
     member _.Augend
         with get() = augend
