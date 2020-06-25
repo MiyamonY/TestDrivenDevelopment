@@ -4,14 +4,20 @@ module Moneys
 open System
 
 // [] $5 + 10CHF = $10
-// [x] $5 + $5 = $10
+// [] $5 + $5 = $10
+// [] $5+$5がMoneyをかえす
+// [x] Bank.reduce(Money)
+// [] Moneyを変換して換算を行う
+// [] Reduce(Bank, string)
 
-type IExpression = interface end
+type IExpression =
+    abstract member Reduce : string -> Money
 
-type Money(amount:int, currency:string) =
+and Money(amount:int, currency:string) =
     let amount = amount
 
-    interface IExpression
+    interface IExpression with
+        member this.Reduce(to_: string) = this
 
     member this.currency = currency
 
@@ -27,7 +33,7 @@ type Money(amount:int, currency:string) =
         Money(amount*multiplier, this.currency)
 
     member this.Plus(addend:Money) =
-        Money(amount + addend.Amount, this.currency)
+        Sum(this, addend)
 
     override this.Equals(obj: Object) =
         match obj with
@@ -35,9 +41,23 @@ type Money(amount:int, currency:string) =
                 amount = money.Amount && this.Currency() = money.Currency()
             | _ -> false
 
+and Sum(augend: Money, addend:Money) =
+    let augend = augend
+    let addend = addend
+
+    interface IExpression with
+        member _.Reduce (to_: string) =
+            Money(augend.Amount + addend.Amount, to_)
+
+    member _.Augend
+        with get() = augend
+
+    member _.Addend
+        with get() = addend
+
 type Bank() =
-    member _.reduce(expr: IExpression, to_: string) =
-        Money.Dollar(10)
+    member _.Reduce(expr: IExpression, to_: string) =
+        expr.Reduce(to_)
 
 [<EntryPoint>]
 let main argv =

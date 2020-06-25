@@ -26,5 +26,26 @@ let ``SimpleAddition`` () =
     let five = Money.Dollar(5)
     let sum = five.Plus(five)
     let bank = Bank()
-    let reduced = bank.reduce(sum, "USD")
+    let reduced = bank.Reduce(sum, "USD")
     Assert.Equal(Money.Dollar(10), reduced)
+
+[<Fact>]
+let ``PlusReturnSum`` () =
+    let five = Money.Dollar(5)
+    let result = five.Plus(five)
+    Assert.Equal(five, result.Augend)
+    Assert.Equal(five, result.Addend)
+
+[<Fact>]
+let ``ReduceMoney`` () =
+    let one = Money.Dollar(1)
+    let bank = Bank()
+    let result = bank.Reduce(one, "USD")
+    Assert.Equal(Money.Dollar(1), result)
+
+[<Fact>]
+let ``ReduceSum`` () =
+    let sum = Money.Dollar(3).Plus(Money.Dollar(4))
+    let bank = Bank()
+    let result = bank.Reduce(sum, "USD")
+    Assert.Equal(Money.Dollar(7), result)
