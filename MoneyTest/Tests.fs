@@ -49,3 +49,14 @@ let ``ReduceSum`` () =
     let bank = Bank()
     let result = bank.Reduce(sum, "USD")
     Assert.Equal(Money.Dollar(7), result)
+
+[<Fact>]
+let ``ReduceMoneyDifferentCurrency`` () =
+    let bank = Bank()
+    bank.AddRate("CHF", "USD", 2) |> ignore
+    let result = bank.Reduce(Money.Franc(2), "USD")
+    Assert.Equal(Money.Dollar(1), result)
+
+[<Fact>]
+let ``IdentityRate`` () =
+    Assert.Equal(1, Bank().Rate("USD", "USD"))
