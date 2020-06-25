@@ -20,3 +20,11 @@ let ``Equality`` () =
 let ``Currency`` () =
     Assert.Equal("USD", Money.Dollar(1).Currency())
     Assert.Equal("CHF", Money.Franc(1).Currency())
+
+[<Fact>]
+let ``SimpleAddition`` () =
+    let five = Money.Dollar(5)
+    let sum = five.Plus(five)
+    let bank = Bank()
+    let reduced = bank.reduce(sum, "USD")
+    Assert.Equal(Money.Dollar(10), reduced)

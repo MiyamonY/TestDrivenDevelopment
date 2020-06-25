@@ -3,23 +3,16 @@ module Moneys
 
 open System
 
-// []  $5 + 10CHF = $10
-// [x] $5 * 2  = $10
-// [x]  amountをprivateに
-// [x] Dollarの副作用
-// []  Moneyの丸め処理
-// [x] struct(to value object)
-// [x] 5CHF*2 = 10CHF
-// [] DollarとFrancの重複
-// [x] equalの一般化
-// [x] timesの一般化
-// [] hashCode()
-// [x] DollarとFrancの比較
-// [x] 通貨の概念
-// [] testFanctMultiplicationを削除する？
+// [] $5 + 10CHF = $10
+// [x] $5 + $5 = $10
+
+type IExpression = interface end
 
 type Money(amount:int, currency:string) =
     let amount = amount
+
+    interface IExpression
+
     member this.currency = currency
 
     static member Dollar(amount:int) = Money(amount, "USD")
@@ -33,11 +26,18 @@ type Money(amount:int, currency:string) =
     member this.Times(multiplier: int) =
         Money(amount*multiplier, this.currency)
 
+    member this.Plus(addend:Money) =
+        Money(amount + addend.Amount, this.currency)
+
     override this.Equals(obj: Object) =
         match obj with
             | :? Money as money ->
                 amount = money.Amount && this.Currency() = money.Currency()
             | _ -> false
+
+type Bank() =
+    member _.reduce(expr: IExpression, to_: string) =
+        Money.Dollar(10)
 
 [<EntryPoint>]
 let main argv =
