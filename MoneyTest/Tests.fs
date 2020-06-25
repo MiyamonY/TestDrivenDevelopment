@@ -24,14 +24,14 @@ let ``Currency`` () =
 [<Fact>]
 let ``SimpleAddition`` () =
     let five = Money.Dollar(5)
-    let sum = five.Plus(five:>IExpression)
+    let sum = five.Plus(five)
     let bank = Bank()
     let reduced = bank.Reduce(sum, "USD")
     Assert.Equal(Money.Dollar(10), reduced)
 
 [<Fact>]
 let ``PlusReturnSum`` () =
-    let five = Money.Dollar(5) :> IExpression
+    let five = Money.Dollar(5)
     let result = five.Plus(five) :?> Sum
     Assert.Equal<IExpression>(five, result.Augend)
     Assert.Equal<IExpression>(five, result.Addend)
@@ -63,9 +63,29 @@ let ``IdentityRate`` () =
 
 [<Fact>]
 let ``MixedAddition`` () =
-    let fiveBucks = Money.Dollar(5) :> IExpression
-    let tenFrancs = Money.Franc(10) :> IExpression
+    let fiveBucks = Money.Dollar(5)
+    let tenFrancs = Money.Franc(10)
     let bank = Bank()
     bank.AddRate("CHF", "USD", 2)
     let result = bank.Reduce(fiveBucks.Plus(tenFrancs), "USD")
     Assert.Equal(Money.Dollar(10), result)
+
+[<Fact>]
+let ``SumPlusMoney`` () =
+    let fiveBucks = Money.Dollar(5)
+    let tenFrancs = Money.Franc(10)
+    let bank = Bank()
+    bank.AddRate("CHF", "USD", 2)
+    let sum = (Sum(fiveBucks, tenFrancs) :> IExpression).Plus(fiveBucks)
+    let result = bank.Reduce(sum, "USD")
+    Assert.Equal(Money.Dollar(15), result)
+
+[<Fact>]
+let ``SumTimes`` () =
+    let fiveBucks = Money.Dollar(5)
+    let tenFrancs = Money.Franc(10)
+    let bank = Bank()
+    bank.AddRate("CHF", "USD", 2)
+    let sum = (Sum(fiveBucks, tenFrancs) :> IExpression).Times(2)
+    let result = bank.Reduce(sum, "USD")
+    Assert.Equal(Money.Dollar(20), result)
