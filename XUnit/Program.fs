@@ -4,11 +4,12 @@
 // [x] setUpを最初に呼び出す
 // [x] tearDownを最後に呼び出す
 // [] テストが失敗しても呼び出す
-// [] 複数のテストを呼び出す
+// [x] 複数のテストを呼び出す
 // [x] 収集したテスト結果を出力する
 // [x] WasRunで文字列をログに記録する
 // [x] 失敗したテストを出力する
 // [] setupのエラーをキャッチして出力する
+// [] TestCaseクラスからTestSuiteを作る
 
 open System
 open System.Reflection
@@ -26,6 +27,8 @@ type TestResult() =
     member _.Summary
         with get () = sprintf "%d run, %d failed" count failedCount
 
+
+
 [<AbstractClass>]
 type TestCase(name: string) =
     abstract member Setup: unit -> unit
@@ -34,8 +37,7 @@ type TestCase(name: string) =
     abstract member TearDown: unit -> unit
     default _.TearDown () = ()
 
-    member this.Run () =
-        let result = TestResult()
+    member this.Run (result: TestResult) =
         result.TestStarted ()
 
         this.Setup()
@@ -45,7 +47,14 @@ type TestCase(name: string) =
 
         this.TearDown()
 
-        result
+type TestSuite() =
+    let mutable suite = []
+
+    member _.Add(case: TestCase) =
+        suite <- case::suite
+
+    member _.Run(result : TestResult) =
+        List.iter (fun (case: TestCase) -> case.Run(result)) suite
 
 type WasRun(name: string) =
     inherit TestCase(name)
@@ -69,31 +78,44 @@ type WasRun(name: string) =
 type TestCaseTest(name: string) =
     inherit TestCase(name)
 
+    let mutable result = TestResult()
+
+    override _.Setup() =
+        result <- TestResult()
+
     member _.TestTemplateMethod() =
         let test = WasRun("TestMethod")
-        test.Run() |> ignore
+        test.Run(result)
         assert (["Setup"; "TestMethod"; "TearDown"] = test.Log)
 
     member _.TestResult () =
         let test = WasRun("TestMethod")
-        let result = test.Run()
+        test.Run(result)
         assert ("1 run, 0 failed" =  result.Summary)
 
     member _.TestResultFormatting () =
-        let result = TestResult()
         result.TestStarted()
         result.TestFailed()
         assert ("1 run, 1 failed" = result.Summary)
 
     member _.TestFailedResult()  =
         let test = WasRun("TestBrokenMethod")
-        let result = test.Run()
+        test.Run(result)
         assert ("1 run, 1 failed" = result.Summary)
+
+    member _.TestSuite() =
+        let suite = TestSuite()
+        suite.Add(WasRun("TestMethod"))
+        suite.Add(WasRun("TestBrokenMethod"))
+        suite.Run(result)
+        assert ("2 run, 1 failed" = result.Summary)
 
 [<EntryPoint>]
 let main argv =
-    TestCaseTest("TestTemplateMethod").Run().Summary |> printfn "%s"
-    TestCaseTest("TestResult").Run().Summary |> printfn "%s"
-    TestCaseTest("TestResultFormatting").Run().Summary |> printfn "%s"
-    TestCaseTest("TestFailedResult").Run().Summary |> printfn "%s"
+    let suite = TestSuite()
+    List.iter (fun name -> suite.Add(TestCaseTest(name)))
+      ["TestTemplateMethod"; "TestResult"; "TestResultFormatting"; "TestFailedResult"; "TestSuite"]
+    let result = TestResult()
+    suite.Run(result)
+    result.Summary |> printfn "%s"
     0
